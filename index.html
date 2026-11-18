@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
+  <!--gitassist t-->>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>unimap | 留学生・旅行者のための別府グルメ＆支払い・食事配慮マップ</title>
-  <meta name="description" content="大分県別府市（APU・別府大など）のグルメマップ unimap。ハラール、ヴィーガン、ベジタリアン対応店や、現金のみ（Cash Only）かキャッシュレス対応かを事前に確認できます。">
-  
+  <meta name="description"
+    content="大分県別府市（APU・別府大など）のグルメマップ unimap。ハラール、ヴィーガン、ベジタリアン対応店や、現金のみ（Cash Only）かキャッシュレス対応かを事前に確認できます。">
+
   <!-- Google Fonts: Outfit & Noto Sans JP -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Top Navigation Bar -->
   <header class="navbar" id="appNavbar">
@@ -24,7 +30,7 @@
           <span class="brand-tagline" id="navBrandTagline">留学生・旅行者のための別府グルメ＆支払い・食事配慮マップ</span>
         </div>
       </div>
-      
+
       <div class="nav-actions">
         <!-- Add Store / Admin Shortcut -->
         <a href="admin.html" class="nav-admin-btn" id="navAddStoreBtn" title="自分でお店を追加・管理">
@@ -48,10 +54,11 @@
           <span class="saved-label" id="savedCountLabel">お気に入り (★)</span>
           <span class="saved-badge" id="savedCounter">0</span>
         </button>
-        
+
         <!-- Language Switcher Button -->
         <div class="lang-switch-wrapper">
-          <button type="button" class="lang-btn" id="langEnBtn" data-lang="en" aria-label="Switch to English">EN</button>
+          <button type="button" class="lang-btn" id="langEnBtn" data-lang="en"
+            aria-label="Switch to English">EN</button>
           <span class="lang-divider">/</span>
           <button type="button" class="lang-btn active" id="langJaBtn" data-lang="ja" aria-label="日本語に切り替え">JP</button>
           <span class="lang-divider">/</span>
@@ -87,9 +94,11 @@
           </div>
           <div class="tips-body" id="tipsBody">
             <ul class="tips-list">
-              <li id="tipText1"><strong>食券機（券売機）に注意：</strong> 定食屋やラーメン店の券売機は<strong>千円札と小銭の現金のみ対応</strong>の店が多いです。一万円札が使えない場合もあるので現金を持参しましょう。</li>
+              <li id="tipText1"><strong>食券機（券売機）に注意：</strong>
+                定食屋やラーメン店の券売機は<strong>千円札と小銭の現金のみ対応</strong>の店が多いです。一万円札が使えない場合もあるので現金を持参しましょう。</li>
               <li id="tipText2"><strong>nimoca / SUGOCA：</strong> 亀の井バス通学で使う交通系ICカードは、コンビニや一部の飲食店でも電子マネーとして利用可能です。</li>
-              <li id="tipText3"><strong>和食の「出汁（だし）」：</strong> 日本の汁物や煮物には魚（鰹節）のエキスが含まれることが多く、「野菜うどん」でも厳密なベジタリアン・ヴィーガンにはならない場合があります。</li>
+              <li id="tipText3"><strong>和食の「出汁（だし）」：</strong>
+                日本の汁物や煮物には魚（鰹節）のエキスが含まれることが多く、「野菜うどん」でも厳密なベジタリアン・ヴィーガンにはならない場合があります。</li>
             </ul>
           </div>
         </div>
@@ -102,28 +111,27 @@
         <!-- Keyword Search Bar -->
         <div class="search-input-wrapper">
           <span class="search-icon" aria-hidden="true">🔍</span>
-          <input 
-            type="search" 
-            id="searchInput" 
-            class="search-input" 
-            placeholder="店名、料理ジャンル、キーワードで検索..." 
-            aria-label="店舗を検索"
-            autocomplete="off"
-          />
-          <button type="button" id="clearSearchBtn" class="clear-search-btn" aria-label="検索文字をクリア" style="display: none;">✕</button>
+          <input type="search" id="searchInput" class="search-input" placeholder="店名、料理ジャンル、キーワードで検索..."
+            aria-label="店舗を検索" autocomplete="off" />
+          <button type="button" id="clearSearchBtn" class="clear-search-btn" aria-label="検索文字をクリア"
+            style="display: none;">✕</button>
         </div>
 
         <!-- Filter Groups -->
         <div class="filters-container">
-          
+
           <!-- 1. Dietary Group -->
           <div class="filter-group" id="dietaryGroup">
             <span class="filter-label" id="labelDietary">食の配慮・制限:</span>
             <div class="chip-group" role="radiogroup" aria-labelledby="labelDietary">
-              <button type="button" class="filter-chip active" data-filter="dietary" data-value="all" id="chipDietaryAll">すべて</button>
-              <button type="button" class="filter-chip chip-vegan" data-filter="dietary" data-value="vegan" id="chipDietaryVegan">ヴィーガン 🌿</button>
-              <button type="button" class="filter-chip chip-veg" data-filter="dietary" data-value="vegetarian" id="chipDietaryVeg">ベジタリアン 🥗</button>
-              <button type="button" class="filter-chip chip-halal" data-filter="dietary" data-value="halal-friendly" id="chipDietaryHalal">ハラール対応・ポークフリー 🍖</button>
+              <button type="button" class="filter-chip active" data-filter="dietary" data-value="all"
+                id="chipDietaryAll">すべて</button>
+              <button type="button" class="filter-chip chip-vegan" data-filter="dietary" data-value="vegan"
+                id="chipDietaryVegan">ヴィーガン 🌿</button>
+              <button type="button" class="filter-chip chip-veg" data-filter="dietary" data-value="vegetarian"
+                id="chipDietaryVeg">ベジタリアン 🥗</button>
+              <button type="button" class="filter-chip chip-halal" data-filter="dietary" data-value="halal-friendly"
+                id="chipDietaryHalal">ハラール対応・ポークフリー 🍖</button>
             </div>
           </div>
 
@@ -131,12 +139,18 @@
           <div class="filter-group" id="paymentGroup">
             <span class="filter-label" id="labelPayment">支払い方法:</span>
             <div class="chip-group" role="radiogroup" aria-labelledby="labelPayment">
-              <button type="button" class="filter-chip active" data-filter="payment" data-value="all" id="chipPaymentAll">すべて</button>
-              <button type="button" class="filter-chip chip-cashless" data-filter="payment" data-value="cashless" id="chipPaymentCashless">キャッシュレス可 💳</button>
-              <button type="button" class="filter-chip" data-filter="payment" data-value="credit" id="chipPaymentCredit">クレジットカード 💳</button>
-              <button type="button" class="filter-chip" data-filter="payment" data-value="paypay" id="chipPaymentPaypay">PayPay 📱</button>
-              <button type="button" class="filter-chip" data-filter="payment" data-value="ic" id="chipPaymentIc">交通系IC (Suica/Nimoca) 🚆</button>
-              <button type="button" class="filter-chip chip-cashonly" data-filter="payment" data-value="cashonly" id="chipPaymentCashonly">現金のみ ⚠️</button>
+              <button type="button" class="filter-chip active" data-filter="payment" data-value="all"
+                id="chipPaymentAll">すべて</button>
+              <button type="button" class="filter-chip chip-cashless" data-filter="payment" data-value="cashless"
+                id="chipPaymentCashless">キャッシュレス可 💳</button>
+              <button type="button" class="filter-chip" data-filter="payment" data-value="credit"
+                id="chipPaymentCredit">クレジットカード 💳</button>
+              <button type="button" class="filter-chip" data-filter="payment" data-value="paypay"
+                id="chipPaymentPaypay">PayPay 📱</button>
+              <button type="button" class="filter-chip" data-filter="payment" data-value="ic" id="chipPaymentIc">交通系IC
+                (Suica/Nimoca) 🚆</button>
+              <button type="button" class="filter-chip chip-cashonly" data-filter="payment" data-value="cashonly"
+                id="chipPaymentCashonly">現金のみ ⚠️</button>
             </div>
           </div>
 
@@ -144,11 +158,16 @@
           <div class="filter-group" id="areaGroup">
             <span class="filter-label" id="labelArea">エリア / バス路線:</span>
             <div class="chip-group" role="radiogroup" aria-labelledby="labelArea">
-              <button type="button" class="filter-chip active" data-filter="area" data-value="all" id="chipAreaAll">すべてのエリア</button>
-              <button type="button" class="filter-chip" data-filter="area" data-value="beppu-station" id="chipAreaStation">別府駅周辺 (Beppu Station)</button>
-              <button type="button" class="filter-chip" data-filter="area" data-value="kamegawa" id="chipAreaKamegawa">亀川・APU周辺 (Kamegawa)</button>
-              <button type="button" class="filter-chip" data-filter="area" data-value="kannawa" id="chipAreaKannawa">鉄輪温泉 (Kannawa)</button>
-              <button type="button" class="filter-chip" data-filter="area" data-value="mochigahama" id="chipAreaMochigahama">餅ヶ浜・石垣 (Mochigahama)</button>
+              <button type="button" class="filter-chip active" data-filter="area" data-value="all"
+                id="chipAreaAll">すべてのエリア</button>
+              <button type="button" class="filter-chip" data-filter="area" data-value="beppu-station"
+                id="chipAreaStation">別府駅周辺 (Beppu Station)</button>
+              <button type="button" class="filter-chip" data-filter="area" data-value="kamegawa"
+                id="chipAreaKamegawa">亀川・APU周辺 (Kamegawa)</button>
+              <button type="button" class="filter-chip" data-filter="area" data-value="kannawa"
+                id="chipAreaKannawa">鉄輪温泉 (Kannawa)</button>
+              <button type="button" class="filter-chip" data-filter="area" data-value="mochigahama"
+                id="chipAreaMochigahama">餅ヶ浜・石垣 (Mochigahama)</button>
             </div>
           </div>
 
@@ -186,11 +205,12 @@
   </main>
 
   <!-- Detailed Restaurant Modal -->
-  <div class="modal-overlay" id="restaurantModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalRestaurantName">
+  <div class="modal-overlay" id="restaurantModal" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="modalRestaurantName">
     <div class="modal-card">
       <!-- Modal Header Close Button -->
       <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="閉じる">✕</button>
-      
+
       <!-- Modal Media & Key Info -->
       <div class="modal-hero-image-wrap">
         <img src="" alt="" id="modalImage" class="modal-hero-image" />
@@ -202,11 +222,12 @@
           <div class="modal-genre-tag" id="modalGenreTag"></div>
           <h2 class="modal-title" id="modalRestaurantName">店舗名</h2>
           <div class="modal-subname" id="modalRestaurantSubname">Restaurant Name (English)</div>
-          
+
           <div class="modal-quick-meta">
             <span class="meta-item"><strong id="modalMetaAreaLabel">エリア:</strong> <span id="modalArea"></span></span>
             <span class="meta-divider">•</span>
-            <span class="meta-item"><strong id="modalMetaBudgetLabel">予算目安:</strong> <span id="modalBudget"></span></span>
+            <span class="meta-item"><strong id="modalMetaBudgetLabel">予算目安:</strong> <span
+                id="modalBudget"></span></span>
           </div>
         </div>
 
@@ -267,13 +288,15 @@
 
         <!-- Modal Action Footer -->
         <div class="modal-actions-footer">
-          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-maps-btn" id="modalMapsLink">
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-maps-btn"
+            id="modalMapsLink">
             <span id="modalMapsBtnLabel">Googleマップで開く 🗺️</span>
           </a>
           <button type="button" class="btn btn-secondary" id="modalShareBtn">
             <span id="modalShareBtnLabel">この店をシェア 🔗</span>
           </button>
-          <a href="#" class="btn btn-secondary modal-edit-btn" id="modalEditBtn" style="display: none;" title="管理画面でこの店舗を編集">
+          <a href="#" class="btn btn-secondary modal-edit-btn" id="modalEditBtn" style="display: none;"
+            title="管理画面でこの店舗を編集">
             <span>✏️</span> <span id="modalEditBtnLabel">管理画面で編集</span>
           </a>
         </div>
@@ -286,8 +309,9 @@
     <div class="qr-modal-card">
       <button type="button" class="qr-modal-close" id="qrModalCloseBtn" aria-label="閉じる">✕</button>
       <h3 id="qrModalTitle" style="font-size: 1.3rem; margin-bottom: 0.3rem;">📱 スマホで unimap を開く</h3>
-      <p style="color: var(--text-muted); font-size: 0.85rem;" id="qrModalSub">スマートフォンのカメラでQRコードを読み取ると、移動中も手軽にお店を検索できます。</p>
-      
+      <p style="color: var(--text-muted); font-size: 0.85rem;" id="qrModalSub">スマートフォンのカメラでQRコードを読み取ると、移動中も手軽にお店を検索できます。
+      </p>
+
       <div class="qr-image-wrap">
         <img id="qrModalImage" src="qrcode_main.png" alt="unimap QR Code" width="220" height="220">
       </div>
@@ -298,8 +322,10 @@
       </div>
 
       <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.8rem;">
-        <button type="button" class="btn btn-primary" id="btnSwitchQrMain" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">メイン画面</button>
-        <button type="button" class="btn btn-secondary" id="btnSwitchQrAdmin" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">管理画面</button>
+        <button type="button" class="btn btn-primary" id="btnSwitchQrMain"
+          style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">メイン画面</button>
+        <button type="button" class="btn btn-secondary" id="btnSwitchQrAdmin"
+          style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">管理画面</button>
       </div>
     </div>
   </div>
@@ -327,4 +353,5 @@
   <script src="store.js?v=2.1"></script>
   <script src="app.js?v=2.1"></script>
 </body>
+
 </html>
