@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>unimap | スマホ接続用 QRコード＆アクセスURL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-light: #fff7ed;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --radius: 16px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+      background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem 4rem;
+    }
+    .header {
+      text-align: center;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(249, 115, 22, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #ffffff 40%, #fdba74 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.8rem;
+      max-width: 1080px;
+      width: 100%;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #f97316;
+    }
+    .card-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: #059669;
+      color: #fff;
+    }
+    .card-badge.orange {
+      background: #f97316;
+    }
+    .card-badge.blue {
+      background: #2563eb;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+      min-height: 38px;
+    }
+    .qr-frame {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1.2rem;
+    }
+    .qr-frame img {
+      width: 220px;
+      height: 220px;
+      display: block;
+    }
+    .url-display {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #38bdf8;
+      width: 100%;
+      word-break: break-all;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+    .btn-group {
+      display: flex;
+      gap: 0.6rem;
+      width: 100%;
+    }
+    .btn {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #f8fafc;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      background: #10b981;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .nav-links-bottom {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .nav-links-bottom a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+    .nav-links-bottom a:hover {
+      color: #f97316;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand-badge">🌊 ♨️ 🥢 unimap Mobile Gateway</div>
+    <h1>スマホで unimap を開く</h1>
+    <p class="subtitle">
+      スマートフォンの標準カメラアプリを起動してQRコードを読み取ると、移動中も手軽にお店を検索できます。
+    </p>
+  </header>
+
+  <div class="grid">
+    <!-- Card 1: Internet Main App -->
+    <div class="card">
+      <span class="card-badge orange">推奨 / 外出先・スマホ</span>
+      <h2 class="card-title">📱 メイン画面</h2>
+      <p class="card-desc">4G/5G・Wi-Fi問わずどこからでもアクセスできる公開URLです（30店舗収録）。</p>
+      
+      <div class="qr-frame">
+        <img src="qrcode_main.png" alt="メイン画面 QRコード" width="220" height="220">
+      </div>
+
+      <div class="url-display" id="urlMain">https://gilbert-mobility-learning-motors.trycloudflare.com</div>
+
+      <div class="btn-group">
+        <a href="https://gilbert-mobility-learning-motors.trycloudflare.com" target="_blank" class="btn btn-primary">開く ↗</a>
+        <button type="button" class="btn btn-secondary" onclick="copyUrl('https://gilbert-mobility-learning-motors.trycloudflare.com')">URLコピー</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Internet Admin App -->
+    <div class="card">
+      <span class="card-badge blue">店舗登録・管理</span>
+      <h2 class="card-title">⚙️ 店舗管理画面</h2>
+      <p class="card-desc">スマホから直接店舗を追加・編集・画像選択できる管理者ダッシュボードです。</p>
+      
+      <div class="qr-frame">
+        <img src="qrcode_admin.png" alt="管理画面 QRコード" width="220" height="220">
+      </div>
+
+      <div class="url-display" id="urlAdmin">https://gilbert-mobility-learning-motors.trycloudflare.com/admin.html</div>
+
+      <div class="btn-group">
+        <a href="https://gilbert-mobility-learning-motors.trycloudflare.com/admin.html" target="_blank" class="btn btn-primary">開く ↗</a>
+        <button type="button" class="btn btn-secondary" onclick="copyUrl('https://gilbert-mobility-learning-motors.trycloudflare.com/admin.html')">URLコピー</button>
+      </div>
+    </div>
+
+    <!-- Card 3: Wi-Fi Local Network -->
+    <div class="card">
+      <span class="card-badge">同一Wi-Fi内</span>
+      <h2 class="card-title">📶 Wi-Fi 接続用</h2>
+      <p class="card-desc">このMacと同じWi-Fiにスマホが接続されている場合に直結アクセスできます。</p>
+      
+      <div class="qr-frame">
+        <img src="qrcode_wifi.png" alt="Wi-Fi QRコード" width="220" height="220">
+      </div>
+
+      <div class="url-display" id="urlWifi">http://192.168.10.64:8080</div>
+
+      <div class="btn-group">
+        <a href="http://192.168.10.64:8080" target="_blank" class="btn btn-primary">開く ↗</a>
+        <button type="button" class="btn btn-secondary" onclick="copyUrl('http://192.168.10.64:8080')">URLコピー</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-links-bottom">
+    <a href="index.html">← このMacのブラウザでメイン画面を開く (localhost:8080)</a>
+    <span>•</span>
+    <a href="admin.html">管理画面を開く (localhost:8080/admin.html)</a>
+  </div>
+
+  <div class="toast" id="toast">URLをコピーしました！📋</div>
+
+  <script>
+    function copyUrl(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(showToast);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast();
+      }
+    }
+
+    let toastTimer = null;
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

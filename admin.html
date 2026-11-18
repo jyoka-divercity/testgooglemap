@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗管理画面 | unimap Admin</title>
+  <meta name="description" content="unimapの飲食店登録・編集・管理コンソール。留学生・旅行者のための別府グルメ情報を自由に追加・管理できます。">
+
+  <!-- Google Fonts: Outfit & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- Admin Header Navigation -->
+  <header class="admin-header">
+    <div class="admin-nav">
+      <a href="index.html" class="admin-brand">
+        <span class="admin-brand-icon">🌊 ♨️ 🥢</span>
+        <div>
+          <span class="admin-brand-title">unimap</span>
+          <span class="admin-brand-badge" id="adminHeaderBadge">管理画面 / Admin</span>
+        </div>
+      </a>
+
+      <div class="admin-nav-actions">
+        <!-- Back to main app -->
+        <a href="index.html" class="btn-back-home" id="btnBackHome">
+          <span>←</span>
+          <span id="labelBackHome">メイン画面に戻る</span>
+        </a>
+
+        <!-- Mobile QR Button -->
+        <button type="button" class="btn-back-home" id="adminQrBtn" title="スマホで開く（QRコード）" style="cursor: pointer;">
+          <span>📱</span>
+          <span>スマホQR</span>
+        </button>
+
+        <!-- Language Switcher -->
+        <div class="lang-switch-wrapper">
+          <button type="button" class="lang-btn" id="adminLangEnBtn" data-lang="en">EN</button>
+          <span class="lang-divider">/</span>
+          <button type="button" class="lang-btn active" id="adminLangJaBtn" data-lang="ja">JP</button>
+          <span class="lang-divider">/</span>
+          <button type="button" class="lang-btn" id="adminLangKoBtn" data-lang="ko">KO</button>
+          <span class="lang-divider">/</span>
+          <button type="button" class="lang-btn" id="adminLangZhBtn" data-lang="zh">ZH</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Statistics Summary Banner -->
+  <section class="admin-stats-bar">
+    <div class="stats-container">
+      <div class="stats-title-wrap">
+        <h1 id="statsHeaderTitle">🍜 店舗管理ダッシュボード</h1>
+        <p class="stats-subtitle" id="statsHeaderSubtitle">別府の新しい飲食店を追加したり、支払い方法や食の配慮情報を編集できます。</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num" id="statTotalCount">0</div>
+          <div class="stat-label" id="statLabelTotal">登録店舗総数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statCustomCount" style="color: #38bdf8;">0</div>
+          <div class="stat-label" id="statLabelCustom">追加した店舗</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statCashlessCount" style="color: #34d399;">0</div>
+          <div class="stat-label" id="statLabelCashless">キャッシュレス可</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statCashonlyCount" style="color: #fb7185;">0</div>
+          <div class="stat-label" id="statLabelCashonly">現金のみ ⚠️</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Switcher -->
+  <div class="admin-tabs-wrapper">
+    <nav class="admin-tabs" role="tablist">
+      <button type="button" class="admin-tab-btn active" data-tab="form" id="tabBtnForm">
+        <span>✏️</span> <span id="tabLabelForm">店舗を追加・編集</span>
+      </button>
+      <button type="button" class="admin-tab-btn" data-tab="list" id="tabBtnList">
+        <span>📋</span> <span id="tabLabelList">登録店舗一覧</span>
+        <span class="saved-badge" id="tabListBadge">0</span>
+      </button>
+      <button type="button" class="admin-tab-btn" data-tab="backup" id="tabBtnBackup">
+        <span>💾</span> <span id="tabLabelBackup">データバックアップ・出力</span>
+      </button>
+    </nav>
+  </div>
+
+  <main>
+    <!-- TAB 1: ADD & EDIT FORM -->
+    <div class="admin-tab-content active" id="tabContentForm">
+      <div class="form-preview-grid">
+        
+        <!-- Left Column: Form -->
+        <div class="form-card">
+          <div class="form-header-bar">
+            <div>
+              <h2 class="form-header-title" id="formMainTitle">
+                <span>➕</span> <span id="formTitleText">新しい店舗を登録</span>
+              </h2>
+              <p class="label-hint" id="formSubText">店舗の基本情報や食の配慮、決済ブランドを入力してください。</p>
+            </div>
+            <div id="editingModeIndicator" style="display: none;">
+              <span class="editing-badge" id="editingBadgeText">編集中</span>
+              <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; margin-left: 0.5rem;">新規追加に戻る</button>
+            </div>
+          </div>
+
+          <form id="restaurantForm" autocomplete="off">
+            <!-- Hidden field for ID when editing -->
+            <input type="hidden" id="formStoreId" value="">
+
+            <!-- SECTION 1: BASIC INFO -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>🏷️</span> <span id="legendBasic">1. 基本情報</span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputNameJa">
+                    <span><span id="labelNameJa">店舗名（日本語）</span> <span class="label-required">*</span></span>
+                  </label>
+                  <input type="text" id="inputNameJa" class="form-input" placeholder="例: 別府スパイスキッチン" required>
+                </div>
+                <div class="form-group">
+                  <label for="inputNameEn">
+                    <span><span id="labelNameEn">店舗名（英語 / アルファベット）</span> <span class="label-required">*</span></span>
+                  </label>
+                  <input type="text" id="inputNameEn" class="form-input" placeholder="例: Beppu Spice Kitchen" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="selectArea">
+                    <span><span id="labelAreaSelect">エリア / バス路線</span> <span class="label-required">*</span></span>
+                  </label>
+                  <select id="selectArea" class="form-select" required>
+                    <option value="beppu-station">別府駅周辺 (Beppu Station)</option>
+                    <option value="kamegawa">亀川・APU周辺 (Kamegawa)</option>
+                    <option value="kannawa">鉄輪温泉 (Kannawa)</option>
+                    <option value="mochigahama">餅ヶ浜・石垣 (Mochigahama)</option>
+                    <option value="other">その他の別府市内 (Other)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inputPriceRange">
+                    <span><span id="labelPriceRange">予算目安</span></span>
+                  </label>
+                  <input type="text" id="inputPriceRange" class="form-input" placeholder="例: ¥800〜¥1,200" value="¥1,000〜¥1,500">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputGenreJa">
+                    <span id="labelGenreJa">料理ジャンル（日本語）</span>
+                  </label>
+                  <input type="text" id="inputGenreJa" class="form-input" placeholder="例: スパイスカレー・ナン・アジア料理">
+                </div>
+                <div class="form-group">
+                  <label for="inputGenreEn">
+                    <span id="labelGenreEn">料理ジャンル（英語）</span>
+                  </label>
+                  <input type="text" id="inputGenreEn" class="form-input" placeholder="例: Spiced Curry, Naan & Asian Cuisine">
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: PHOTO & IMAGE -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>📸</span> <span id="legendPhoto">2. 写真・画像設定</span>
+              </div>
+
+              <div class="form-group">
+                <label for="inputImageUrl">
+                  <span id="labelImageUrl">画像URL（Web上の画像リンク）</span>
+                  <span class="label-hint">以下の高画質プリセットからワンクリックで選択も可能</span>
+                </label>
+                <input type="url" id="inputImageUrl" class="form-input" placeholder="https://..." value="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80">
+              </div>
+
+              <div class="preset-photo-section">
+                <div class="preset-title">
+                  <span>🎨</span> <span id="labelPresetPick">おすすめ写真プリセット（クリックして選択）：</span>
+                </div>
+                <div class="preset-gallery" id="presetGallery">
+                  <!-- Generated via store.js -->
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: DIETARY RESTRICTIONS -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>🥗</span> <span id="legendDietary">3. 食の配慮・制限（留学生向け重要項目）</span>
+              </div>
+
+              <div class="checkbox-grid" style="margin-bottom: 1.25rem;">
+                <label class="custom-checkbox-card" id="cardDietaryVegan">
+                  <input type="checkbox" id="checkVegan" value="vegan">
+                  <div>
+                    <strong>🌿 Vegan (ヴィーガン)</strong>
+                    <div class="label-hint">100%植物性・動物性不使用</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card" id="cardDietaryVeg">
+                  <input type="checkbox" id="checkVegetarian" value="vegetarian">
+                  <div>
+                    <strong>🥗 Vegetarian (ベジタリアン)</strong>
+                    <div class="label-hint">肉・魚不使用</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card" id="cardDietaryHalal">
+                  <input type="checkbox" id="checkHalal" value="halal-friendly">
+                  <div>
+                    <strong>🍖 Halal-friendly (ハラール対応)</strong>
+                    <div class="label-hint">ハラール認証肉・ポークフリー</div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputDietaryNotesJa"><span id="labelDietaryNotesJa">食事配慮・アレルゲン方針（日本語）</span></label>
+                  <textarea id="inputDietaryNotesJa" class="form-textarea" placeholder="例: ハラール認証肉を使用。豚肉・アルコールは一切使用していません。ヴィーガン対応カレーもご用意しています。"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="inputDietaryNotesEn"><span id="labelDietaryNotesEn">食事配慮・アレルゲン方針（英語）</span></label>
+                  <textarea id="inputDietaryNotesEn" class="form-textarea" placeholder="e.g. 100% Halal-certified chicken. No pork or alcohol used in cooking. Vegan curry plate also available."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: PAYMENT METHODS -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>💳</span> <span id="legendPayment">4. 支払い方法（Cash Only警告＆キャッシュレス対応）</span>
+              </div>
+
+              <div class="payment-mode-selector">
+                <label class="payment-mode-card selected-cashless" id="modeCashlessCard">
+                  <input type="radio" name="paymentType" id="radioCashless" value="cashless" checked>
+                  <div>
+                    <span class="mode-info-title" style="color: var(--cashless-color);">💳 キャッシュレス可 (Cashless OK)</span>
+                    <span class="mode-info-desc">クレジットカード、PayPay、交通系ICなどが使えます</span>
+                  </div>
+                </label>
+
+                <label class="payment-mode-card" id="modeCashonlyCard">
+                  <input type="radio" name="paymentType" id="radioCashonly" value="cashonly">
+                  <div>
+                    <span class="mode-info-title" style="color: var(--cashonly-color);">⚠️ 現金のみ (Cash Only)</span>
+                    <span class="mode-info-desc">食券機や現金会計のみ。留学生に注意喚起します</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-group" id="brandsGroupWrap">
+                <label>
+                  <span id="labelAcceptedBrands">対応決済ブランド（クリックして選択/解除）:</span>
+                </label>
+                <div class="brand-chips-wrap" id="brandChipsWrap">
+                  <!-- Populated from store.js -->
+                </div>
+                <input type="text" id="inputCustomBrands" class="form-input" style="margin-top: 0.5rem;" placeholder="その他のブランド（カンマ区切りで自由入力: 例: WeChat Pay, Alipay）">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputPaymentNoteJa"><span id="labelPaymentNoteJa">決済に関する補足（日本語）</span></label>
+                  <input type="text" id="inputPaymentNoteJa" class="form-input" placeholder="例: PayPayや各種クレジットカード対応。交通系ICも使えます。">
+                </div>
+                <div class="form-group">
+                  <label for="inputPaymentNoteEn"><span id="labelPaymentNoteEn">決済に関する補足（英語）</span></label>
+                  <input type="text" id="inputPaymentNoteEn" class="form-input" placeholder="e.g. Major credit cards and PayPay accepted. Transit IC also available.">
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 5: STUDENT-FRIENDLY SERVICES -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>🎓</span> <span id="legendStudent">5. 留学生・学生向けサービス</span>
+              </div>
+
+              <div class="checkbox-grid">
+                <label class="custom-checkbox-card">
+                  <input type="checkbox" id="checkStudentDiscount">
+                  <div>
+                    <strong>🎓 学割あり</strong>
+                    <div class="label-hint">学生証提示で割引や特典</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card">
+                  <input type="checkbox" id="checkEnglishMenu" checked>
+                  <div>
+                    <strong>📖 英語メニューあり</strong>
+                    <div class="label-hint">英語表記や写真付きメニュー</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card">
+                  <input type="checkbox" id="checkEnglishStaff">
+                  <div>
+                    <strong>🗣️ 英語対応スタッフ</strong>
+                    <div class="label-hint">英語での接客が可能</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card">
+                  <input type="checkbox" id="checkWifi">
+                  <div>
+                    <strong>📶 Free Wi-Fi</strong>
+                    <div class="label-hint">店内で無料Wi-Fi利用可</div>
+                  </div>
+                </label>
+
+                <label class="custom-checkbox-card">
+                  <input type="checkbox" id="checkTakeout" checked>
+                  <div>
+                    <strong>🥡 テイクアウト可</strong>
+                    <div class="label-hint">持ち帰り注文に対応</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- SECTION 6: PRACTICAL DETAILS & RECOMMENDATIONS -->
+            <div class="form-section">
+              <div class="section-legend">
+                <span>📍</span> <span id="legendDetails">6. 詳細情報・おすすめメニュー・アクセス</span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputRecommendJa"><span id="labelRecommendJa">おすすめメニュー（日本語）</span></label>
+                  <input type="text" id="inputRecommendJa" class="form-input" placeholder="例: 特製スパイスヴィーガンカレー（¥1,100）">
+                </div>
+                <div class="form-group">
+                  <label for="inputRecommendEn"><span id="labelRecommendEn">おすすめメニュー（英語）</span></label>
+                  <input type="text" id="inputRecommendEn" class="form-input" placeholder="e.g. Spiced Veggie Vegan Curry (¥1,100)">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputHoursJa"><span id="labelHoursJa">営業時間（日本語）</span></label>
+                  <input type="text" id="inputHoursJa" class="form-input" placeholder="例: 11:30 - 20:00 (L.O. 19:30)" value="11:30 - 20:00">
+                </div>
+                <div class="form-group">
+                  <label for="inputHoursEn"><span id="labelHoursEn">営業時間（英語）</span></label>
+                  <input type="text" id="inputHoursEn" class="form-input" placeholder="e.g. 11:30 - 20:00 (L.O. 19:30)" value="11:30 - 20:00">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputHolidayJa"><span id="labelHolidayJa">定休日（日本語）</span></label>
+                  <input type="text" id="inputHolidayJa" class="form-input" placeholder="例: 毎週火曜日定休" value="不定休">
+                </div>
+                <div class="form-group">
+                  <label for="inputHolidayEn"><span id="labelHolidayEn">定休日（英語）</span></label>
+                  <input type="text" id="inputHolidayEn" class="form-input" placeholder="e.g. Closed on Tuesdays" value="Irregular holidays">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputAddressJa"><span id="labelAddressJa">住所・アクセス（日本語）</span></label>
+                  <input type="text" id="inputAddressJa" class="form-input" placeholder="例: 大分県別府市駅前町2-3-15（別府駅東口より徒歩3分）">
+                </div>
+                <div class="form-group">
+                  <label for="inputAddressEn"><span id="labelAddressEn">住所・アクセス（英語）</span></label>
+                  <input type="text" id="inputAddressEn" class="form-input" placeholder="e.g. 2-3-15 Ekimae-cho, Beppu-shi (3 min from Beppu Station)">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="inputMapsUrl">
+                  <span id="labelMapsUrl">GoogleマップURL</span>
+                  <span class="label-hint">Googleマップの共有リンクまたは検索URL</span>
+                </label>
+                <input type="url" id="inputMapsUrl" class="form-input" placeholder="https://maps.google.com/?q=..." value="https://maps.google.com/?q=Beppu+Station">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputDescJa"><span id="labelDescJa">店舗紹介文（日本語）</span></label>
+                  <textarea id="inputDescJa" class="form-textarea" placeholder="別府の留学生に向けたお店の魅力やおすすめポイントを入力してください。"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="inputDescEn"><span id="labelDescEn">店舗紹介文（英語）</span></label>
+                  <textarea id="inputDescEn" class="form-textarea" placeholder="Write a short welcoming description for international students visiting this place."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions-bar">
+              <button type="button" class="btn btn-secondary" id="btnResetForm">
+                <span>🧹</span> <span id="labelClearForm">クリア</span>
+              </button>
+              <button type="submit" class="btn btn-primary" id="btnSubmitForm" style="font-size: 1rem; padding: 0.85rem 1.75rem;">
+                <span>✨</span> <span id="labelSubmitForm">この内容で店舗を登録する</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right Column: Real-time Live Card Preview -->
+        <div class="preview-sticky-wrap">
+          <div class="preview-header">
+            <h3 class="preview-title">
+              <span>📱</span> <span id="labelLivePreview">リアルタイム表示プレビュー</span>
+            </h3>
+            <div class="preview-lang-switch">
+              <button type="button" class="preview-lang-btn active" id="previewLangJaBtn">JP</button>
+              <button type="button" class="preview-lang-btn" id="previewLangEnBtn">EN</button>
+              <button type="button" class="preview-lang-btn" id="previewLangKoBtn">KO</button>
+              <button type="button" class="preview-lang-btn" id="previewLangZhBtn">ZH</button>
+            </div>
+          </div>
+
+          <div class="preview-card-container">
+            <div id="liveCardPreview" style="width: 100%;">
+              <!-- Rendered live via JS -->
+            </div>
+            <p class="preview-notice" id="labelPreviewNotice">
+              💡 入力内容に合わせて本番と同じカードデザインがリアルタイムに更新されます。
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: MANAGE ALL STORES LIST -->
+    <div class="admin-tab-content" id="tabContentList">
+      <div class="manage-header-card">
+        <div class="manage-search-wrap">
+          <span>🔍</span>
+          <input type="search" id="manageSearchInput" class="form-input" placeholder="店舗名、エリア、ジャンルで検索...">
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-primary" id="btnQuickAddNew">
+            <span>➕</span> <span id="labelQuickAddNew">新しい店舗を登録</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="manage-table-container">
+        <div style="overflow-x: auto;">
+          <table class="manage-table">
+            <thead>
+              <tr>
+                <th id="thStore">店舗情報</th>
+                <th id="thArea">エリア</th>
+                <th id="thDietary">食の配慮</th>
+                <th id="thPayment">支払い方法</th>
+                <th id="thType">種別</th>
+                <th id="thActions" style="text-align: right;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="manageTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: BACKUP & DATA TOOLS -->
+    <div class="admin-tab-content" id="tabContentBackup">
+      <div class="backup-grid">
+        <!-- JSON Export Card -->
+        <div class="backup-card">
+          <div class="backup-card-icon">📥</div>
+          <h3 class="backup-card-title" id="titleExportJson">JSON形式でエクスポート</h3>
+          <p class="backup-card-desc" id="descExportJson">登録された全店舗（初期店舗＋追加店舗）をJSONファイルとしてダウンロード保存します。別PCへの移行やバックアップに最適です。</p>
+          <button type="button" class="btn btn-primary" id="btnDownloadJson">
+            <span>⬇️</span> <span id="labelDownloadJson">JSONファイルをダウンロード</span>
+          </button>
+        </div>
+
+        <!-- JSON Import Card -->
+        <div class="backup-card">
+          <div class="backup-card-icon">📤</div>
+          <h3 class="backup-card-title" id="titleImportJson">JSONファイルから復元・インポート</h3>
+          <p class="backup-card-desc" id="descImportJson">以前エクスポートしたJSONファイルを選択して店舗データを復元します。</p>
+          <input type="file" id="fileImportJson" accept=".json" style="display: none;">
+          <button type="button" class="btn btn-secondary" id="btnTriggerImport">
+            <span>📂</span> <span id="labelChooseJson">JSONファイルを選択して復元</span>
+          </button>
+        </div>
+
+        <!-- data.js Source Code Generator -->
+        <div class="backup-card" style="grid-column: 1 / -1;">
+          <div class="backup-card-icon">💻</div>
+          <h3 class="backup-card-title" id="titleDataJsCode">data.js 向け永続化コード生成</h3>
+          <p class="backup-card-desc" id="descDataJsCode">現在ブラウザに保存されている店舗データを、プロジェクトの <code>data.js</code> にそのまま直接貼り付けて恒久的な標準データにできるJavaScriptコードです。</p>
+          <div class="backup-code-box" id="dataJsCodePreview">// Loading...</div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-primary" id="btnCopyDataJs">
+              <span>📋</span> <span id="labelCopyDataJs">コードをクリップボードにコピー</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnResetToDefaults" style="color: #e11d48; border-color: #fecdd3; margin-left: auto;">
+              <span>⚠️</span> <span id="labelResetDefault">標準データ（30店舗）にリセット</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Confirm Dialog -->
+  <div class="admin-modal-overlay" id="confirmDeleteModal">
+    <div class="admin-dialog">
+      <h3 class="dialog-title" style="color: #e11d48;">
+        <span>🗑️</span> <span id="dialogDeleteTitle">店舗の削除確認</span>
+      </h3>
+      <p class="dialog-msg" id="dialogDeleteMsg">この店舗を削除してもよろしいですか？この操作は取り消せません。</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="btnCancelDelete">キャンセル</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmDelete" style="background: #e11d48; border-color: #be123c;">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Confirm Dialog -->
+  <div class="admin-modal-overlay" id="confirmResetModal">
+    <div class="admin-dialog">
+      <h3 class="dialog-title" style="color: #e11d48;">
+        <span>⚠️</span> <span id="dialogResetTitle">初期状態へのリセット</span>
+      </h3>
+      <p class="dialog-msg" id="dialogResetMsg">追加した店舗を含むすべてのデータが初期状態（標準30店舗）に戻ります。よろしいですか？</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="btnCancelReset">キャンセル</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmReset" style="background: #e11d48; border-color: #be123c;">リセットを実行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code Modal (Scan from Smartphone) -->
+  <div class="qr-modal-backdrop" id="adminQrModal" role="dialog" aria-modal="true" aria-labelledby="adminQrModalTitle">
+    <div class="qr-modal-card">
+      <button type="button" class="qr-modal-close" id="adminQrModalCloseBtn" aria-label="閉じる">✕</button>
+      <h3 id="adminQrModalTitle" style="font-size: 1.3rem; margin-bottom: 0.3rem;">📱 スマホで開く</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem;">スマートフォンのカメラでQRコードを読み取ると、スマホから操作できます。</p>
+      
+      <div class="qr-image-wrap">
+        <img id="adminQrModalImage" src="qrcode_admin.png" alt="Admin QR Code" width="220" height="220">
+      </div>
+
+      <div class="qr-url-box">
+        <span class="qr-url-text" id="adminQrModalUrlText">https://gilbert-mobility-learning-motors.trycloudflare.com/admin.html</span>
+        <button type="button" class="btn-copy-qr-url" id="adminBtnCopyQrUrl">URLコピー</button>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.8rem;">
+        <button type="button" class="btn btn-secondary" id="adminBtnSwitchQrMain" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">メイン画面</button>
+        <button type="button" class="btn btn-primary" id="adminBtnSwitchQrAdmin" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">管理画面</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="adminToast" role="alert" aria-live="polite">
+    <span id="adminToastMsg"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js?v=2.1"></script>
+  <script src="store.js?v=2.1"></script>
+  <script src="admin.js?v=2.1"></script>
+</body>
+</html>
